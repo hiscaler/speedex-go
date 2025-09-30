@@ -22,7 +22,7 @@ const (
 	OK              = 200 // 无错误
 	BadRequestError = 400 // 请求错误
 	InvalidToken    = 401 // 无效的 Token
-	InternalError   = 500 // 服务器错误
+	InternalError   = 500 // 内部服务器错误
 )
 
 const (
@@ -143,7 +143,7 @@ func errorWrap(code int, message string) error {
 	default:
 		if code == InternalError {
 			if message == "" {
-				message = "内部错误，请联系闪派国际客服"
+				message = "内部服务器错误，请联系【闪派国际】客服人员"
 			}
 		} else {
 			message = strings.TrimSpace(message)
