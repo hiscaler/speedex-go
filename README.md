@@ -1,2 +1,3 @@
-# speedex-go
-闪派国际 SDK
+# 闪派国际 SDK
+
+https://docs.speedex.net.cn/
