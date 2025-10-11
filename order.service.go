@@ -3,9 +3,11 @@ package speedex
 import (
 	"context"
 	"errors"
+	"strings"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/hiscaler/speedex-go/entity"
+	"github.com/samber/lo"
 	"gopkg.in/guregu/null.v4"
 )
 
@@ -144,6 +146,12 @@ func (s orderService) Create(ctx context.Context, requests []CreateOrderRequest)
 // RetryCreate 重新下单
 // https://docs.speedex.net.cn/357671120e0
 func (s orderService) RetryCreate(ctx context.Context, orderNumbers ...string) error {
+	orderNumbers = lo.Map(orderNumbers, func(item string, index int) string {
+		return strings.TrimSpace(item)
+	})
+	orderNumbers = lo.Filter(orderNumbers, func(item string, index int) bool {
+		return item != ""
+	})
 	if len(orderNumbers) == 0 {
 		return errors.New("订单号不能为空")
 	}
