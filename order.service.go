@@ -2,6 +2,7 @@ package speedex
 
 import (
 	"context"
+	"errors"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 	"github.com/hiscaler/speedex-go/entity"
@@ -138,6 +139,19 @@ func (s orderService) Create(ctx context.Context, requests []CreateOrderRequest)
 		return nil, err
 	}
 	return res, nil
+}
+
+// RetryCreate 重新下单
+func (s orderService) RetryCreate(ctx context.Context, orderNumbers ...string) error {
+	if len(orderNumbers) == 0 {
+		return errors.New("订单号不能为空")
+	}
+
+	resp, err := s.httpClient.R().
+		SetContext(ctx).
+		SetBody(map[string][]string{"orderNos": orderNumbers}).
+		Post("/external/orders/reload")
+	return recheckError(resp, err)
 }
 
 type OrderQueryRequest struct {
