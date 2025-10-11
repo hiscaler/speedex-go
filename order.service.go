@@ -142,6 +142,7 @@ func (s orderService) Create(ctx context.Context, requests []CreateOrderRequest)
 }
 
 // RetryCreate 重新下单
+// https://docs.speedex.net.cn/357671120e0
 func (s orderService) RetryCreate(ctx context.Context, orderNumbers ...string) error {
 	if len(orderNumbers) == 0 {
 		return errors.New("订单号不能为空")
