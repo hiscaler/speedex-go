@@ -68,7 +68,7 @@ func Test_orderService_Query(t *testing.T) {
 
 func Test_orderService_Cancel(t *testing.T) {
 	results, err := client.Services.Order.Cancel(ctx, CancelOrderRequest{
-		OrderNos: "000010202509290000001",
+		OrderNos: []string{"000010202509290000001"},
 	})
 	assert.Nil(t, err)
 	assert.Equal(t, "000010202509290000001", results[0].OrderNo)

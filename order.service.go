@@ -53,6 +53,9 @@ func (m OrderBox) Validate() error {
 			validation.Min(0.01).Error("重量不能小于 {{.min}}"),
 			validation.Max(999999.99).Error("重量不能大于 {{.max}}"),
 		),
+		validation.Field(&m.Skus,
+			validation.Required.Error("SKU 列表不能为空"),
+		),
 	)
 }
 
@@ -199,7 +202,7 @@ func (s orderService) Query(ctx context.Context, req OrderQueryRequest) ([]entit
 }
 
 type CancelOrderRequest struct {
-	OrderNos string `json:"orderNos"` // 订单号
+	OrderNos []string `json:"orderNos"` // 订单号
 }
 
 func (m CancelOrderRequest) validate() error {
