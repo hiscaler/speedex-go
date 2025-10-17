@@ -73,9 +73,7 @@ func NewClient(ctx context.Context, cfg config.Config) *Client {
 		SetRetryCount(2).
 		SetRetryWaitTime(2 * time.Second).
 		SetRetryMaxWaitTime(5 * time.Second)
-
 	speedExClient.httpClient = httpClient
-
 	xService := service{
 		config:     &cfg,
 		logger:     logger,
