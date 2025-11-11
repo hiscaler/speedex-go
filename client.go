@@ -107,6 +107,15 @@ func (c *Client) getAccessToken(ctx context.Context) error {
 			"Content-Type": "application/json",
 			"Accept":       "application/json",
 			"User-Agent":   userAgent,
+		}).
+		SetRetryCount(3).
+		SetRetryWaitTime(time.Duration(500) * time.Millisecond).
+		SetRetryMaxWaitTime(time.Duration(1) * time.Second).
+		AddRetryCondition(func(response *resty.Response, err error) bool {
+			if response == nil || response.Body() == nil {
+				return true
+			}
+			return false
 		})
 	resp, err := httpClient.R().
 		SetContext(ctx).
