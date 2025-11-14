@@ -238,18 +238,21 @@ func (s orderService) Cancel(ctx context.Context, req CancelOrderRequest) ([]Ord
 type OrderEstimateRequest = CreateOrderRequest
 
 // Estimate 订单费用试算
-func (s orderService) Estimate(ctx context.Context, req OrderEstimateRequest) (res entity.OrderEstimateResult, err error) {
-	if err = req.Validate(); err != nil {
-		return res, invalidInput(err)
+// https://docs.speedex.net.cn/315079586e0
+func (s orderService) Estimate(ctx context.Context, requests []OrderEstimateRequest) (results []entity.OrderEstimateResult, err error) {
+	for _, req := range requests {
+		if err = req.Validate(); err != nil {
+			return results, invalidInput(err)
+		}
 	}
 
 	resp, err := s.httpClient.R().
 		SetContext(ctx).
-		SetBody(req).
-		SetResult(&res).
+		SetBody(requests).
+		SetResult(&results).
 		Post("/external/orders/estimate")
 	if err = recheckError(resp, err); err != nil {
-		return res, err
+		return results, err
 	}
-	return res, nil
+	return results, nil
 }
