@@ -183,13 +183,13 @@ func (s orderService) Query(ctx context.Context, req OrderQueryRequest) ([]entit
 		return nil, invalidInput(err)
 	}
 
-	var res []entity.Order
+	var orders []entity.Order
 	resp, err := s.httpClient.R().
 		SetContext(ctx).
 		SetQueryParams(map[string]string{
 			"customerNos": req.CustomerNos,
 		}).
-		SetResult(&res).
+		SetResult(&orders).
 		Get("/external/orders")
 	if err != nil {
 		return nil, err
@@ -198,7 +198,21 @@ func (s orderService) Query(ctx context.Context, req OrderQueryRequest) ([]entit
 	if err = recheckError(resp, err); err != nil {
 		return nil, err
 	}
-	return res, nil
+
+	// 下游段发起请求可有重复的 customerNo 数据，这种情况应该是需要上游端杜绝的，但是目前发现存在这种情况，短时间内同样的 customerNo 有一个失败，一个处理中的数据，这种情况下需要过滤掉状态为 failed 的数据，但是需要注意的是如果只有一个单的话，无论什么状态都是不需要过滤掉的
+	kvOrders := lo.GroupByMap(orders, func(item entity.Order) (string, entity.Order) {
+		return item.CustomerNo, item
+	})
+	orders = make([]entity.Order, 0)
+	for _, rawOrders := range kvOrders {
+		if len(rawOrders) != 1 {
+			rawOrders = lo.Filter(rawOrders, func(item entity.Order, index int) bool {
+				return !strings.EqualFold(item.Status, "failed")
+			})
+		}
+		orders = append(orders, rawOrders...)
+	}
+	return orders, nil
 }
 
 type CancelOrderRequest struct {
