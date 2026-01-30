@@ -58,12 +58,15 @@ func Test_orderService_Create(t *testing.T) {
 }
 
 func Test_orderService_Query(t *testing.T) {
+	customerNo := "XY-112-ABC"
 	res, err := client.Services.Order.Query(ctx, OrderQueryRequest{
-		CustomerNos: "PK000002696",
+		CustomerNos: customerNo,
 	})
 	assert.Nil(t, err)
 	assert.NotEmpty(t, res)
-	assert.Equal(t, "XY-112-ABC", res[0].CustomerNo)
+	if len(res) != 0 {
+		assert.Equal(t, customerNo, res[0].CustomerNo)
+	}
 }
 
 func Test_orderService_Cancel(t *testing.T) {
